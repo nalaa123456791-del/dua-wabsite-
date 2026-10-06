@@ -1,2 +1,720 @@
-# dua-wabsite-
-my wabsite 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masnoon Duas App</title>
+    <style>
+        :root {
+            --primary-color: #008080;
+            --text-color: #333;
+            --bg-color: #f4f6f8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* Dynamic Image Banner Ad Container */
+        .top-banner-ad {
+            background-color: #ffeaa7;
+            color: #d63031;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+            border-bottom: 2px solid #fdcb6e;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .top-banner-ad img {
+            width: 100%;
+            max-height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 18px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Drawer Side Menu */
+        .drawer {
+            position: absolute;
+            top: 0;
+            left: -280px;
+            width: 260px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            transition: left 0.3s ease;
+            z-index: 110;
+        }
+
+        .drawer.open {
+            left: 0;
+        }
+
+        .drawer-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px 15px;
+        }
+
+        .drawer-menu {
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        .drawer-menu li {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            z-index: 105;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Main Screen */
+        .screen {
+            display: none;
+            flex: 1;
+            padding: 15px;
+            padding-bottom: 70px;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .arabic-text {
+            font-size: 22px;
+            text-align: right;
+            direction: rtl;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .translation-text {
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .translation-text.rtl {
+            text-align: right;
+            direction: rtl;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 8px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .like-btn, .share-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .like-btn.liked {
+            color: red;
+        }
+
+        /* Profile & Settings */
+        .profile-card {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 15px;
+        }
+
+        .avatar {
+            width: 90px;
+            height: 90px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+        }
+
+        .avatar-upload-label {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #333;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .btn-submit {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .status-box {
+            background: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            padding: 10px;
+            margin-top: 10px;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        /* Navigation */
+        nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        .nav-item {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            background: none;
+            border: none;
+            color: #777;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .nav-item span {
+            display: block;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Top Ad Banner (Dynamic Image & Text) -->
+    <div class="top-banner-ad" id="topAdBanner">
+        <span id="adText">📢 Sponsored Banner Ad</span>
+        <img id="adImg" src="" style="display: none;" alt="Ad Banner">
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <h3>User Profile</h3>
+            <p id="drawerLangText" style="font-size: 12px;">Current Language: Urdu</p>
+        </div>
+        <ul class="drawer-menu">
+            <li id="menuHome">🏠 Home (All Duas)</li>
+            <li id="menuToday">📅 Today's Duas</li>
+            <li id="menuProfile">⚙️ Change Language / Profile</li>
+        </ul>
+    </div>
+
+    <header>
+        <button class="icon-btn" id="drawerToggleBtn">☰</button>
+        <h1 id="pageTitle">Masnoon Duas</h1>
+        <div></div>
+    </header>
+
+    <!-- 1. HOME SCREEN -->
+    <div id="homeScreen" class="screen active">
+        <input type="text" class="search-box" id="searchInput" placeholder="Search any Dua...">
+        <div id="duasContainer"></div>
+    </div>
+
+    <!-- 2. TODAY'S DUAS SCREEN -->
+    <div id="todayScreen" class="screen">
+        <div id="todayDuasContainer"></div>
+    </div>
+
+    <!-- 3. PROFILE SCREEN -->
+    <div id="profileScreen" class="screen">
+        <div class="profile-card">
+            <div class="avatar-container">
+                <img id="profileImage" class="avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 24 24' fill='%23ffffff'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" alt="Profile">
+                <label for="imageUpload" class="avatar-upload-label">📷</label>
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            </div>
+
+            <div class="form-group">
+                <label>Profile Name:</label>
+                <input type="text" id="userName" value="User Name">
+            </div>
+
+            <div class="form-group">
+                <label>Select Translation Language:</label>
+                <select id="languageSelect">
+                    <option value="Urdu" selected>Urdu (اردو)</option>
+                    <option value="Hindi">Hindi (हिंदी)</option>
+                    <option value="English">English</option>
+                    <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+                    <option value="Arabic">Arabic (العربية)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Theme Color:</label>
+                <select id="themeColorSelect">
+                    <option value="#008080" selected>Teal (Default)</option>
+                    <option value="#d63031">Red</option>
+                    <option value="#0984e3">Blue</option>
+                    <option value="#e84393">Pink</option>
+                    <option value="#2ed573">Green</option>
+                    <option value="#2f3542">Dark Gray</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Add 24-Hour Note/Status:</label>
+                <textarea id="statusInput" rows="2" placeholder="Write something... (Auto expires in 24 hours)"></textarea>
+                <button class="btn-submit" id="saveStatusBtn" style="margin-top: 5px;">Post Status</button>
+            </div>
+
+            <div id="statusDisplayContainer" class="status-box" style="display: none;">
+                <p><strong>Your Current Status:</strong></p>
+                <p id="userStatusText"></p>
+                <small id="statusExpiryTime" style="color: #888;"></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav>
+        <button class="nav-item active" id="navHome">
+            <span>🏠</span> Home
+        </button>
+        <button class="nav-item" id="navToday">
+            <span>📋</span> Today's Dua
+        </button>
+        <button class="nav-item" id="navProfile">
+            <span>👤</span> Profile
+        </button>
+    </nav>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAdj6O94cYUUQAz7P8JnEc0bLz6TZENVec",
+        authDomain: "masnoon-duas-7841f.firebaseapp.com",
+        databaseURL: "https://masnoon-duas-7841f-default-rtdb.firebaseio.com",
+        projectId: "masnoon-duas-7841f",
+        storageBucket: "masnoon-duas-7841f.firebasestorage.app",
+        messagingSenderId: "685885209216",
+        appId: "1:685885209216:web:afec849178ca7fa74b8465"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let currentLanguage = 'Urdu';
+    let loadedDuas = [];
+
+    // Firebase Dynamic Ad Fetch (Text + Image + Link)
+    const adRef = ref(db, 'ads/topBanner');
+    onValue(adRef, (snapshot) => {
+        const adData = snapshot.val();
+        const bannerElem = document.getElementById('topAdBanner');
+        const textElem = document.getElementById('adText');
+        const imgElem = document.getElementById('adImg');
+
+        if (adData) {
+            if (adData.text) {
+                textElem.innerText = adData.text;
+                textElem.style.display = 'block';
+            } else {
+                textElem.style.display = 'none';
+            }
+
+            if (adData.bannerImg) {
+                imgElem.src = adData.bannerImg;
+                imgElem.style.display = 'block';
+            } else {
+                imgElem.style.display = 'none';
+            }
+
+            if (adData.link) {
+                bannerElem.onclick = () => window.open(adData.link, '_blank');
+            }
+        }
+    });
+
+    // Firebase Duas Fetch
+    const duasRef = ref(db, 'duas');
+    onValue(duasRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            loadedDuas = Array.isArray(data) ? data : Object.values(data);
+        }
+        renderDuas();
+        renderTodayDuas();
+    });
+
+    // UI interactions
+    window.toggleDrawer = function() {
+        document.getElementById('drawer').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('active');
+    };
+
+    window.switchTab = function(tab) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+        if (tab === 'home') {
+            document.getElementById('homeScreen').classList.add('active');
+            document.getElementById('navHome').classList.add('active');
+            document.getElementById('pageTitle').innerText = 'Masnoon Duas';
+        } else if (tab === 'today') {
+            document.getElementById('todayScreen').classList.add('active');
+            document.getElementById('navToday').classList.add('active');
+            document.getElementById('pageTitle').innerText = "Today's Duas";
+            renderTodayDuas();
+        } else if (tab === 'profile') {
+            document.getElementById('profileScreen').classList.add('active');
+            document.getElementById('navProfile').classList.add('active');
+            document.getElementById('pageTitle').innerText = 'Profile';
+        }
+
+        if (document.getElementById('drawer').classList.contains('open')) {
+            window.toggleDrawer();
+        }
+    };
+
+    window.changeLanguage = function(lang) {
+        currentLanguage = lang;
+        document.getElementById('drawerLangText').innerText = 'Current Language: ' + currentLanguage;
+        renderDuas();
+        renderTodayDuas();
+    };
+
+    window.toggleLike = function(id) {
+        let duaIndex = loadedDuas.findIndex(d => String(d.id) === String(id));
+        if (duaIndex !== -1) {
+            let dua = loadedDuas[duaIndex];
+            dua.isLiked = !dua.isLiked;
+            dua.likes = (dua.likes || 0) + (dua.isLiked ? 1 : -1);
+
+            const singleDuaRef = ref(db, 'duas/' + id);
+            update(singleDuaRef, { likes: dua.likes }).catch(() => {});
+
+            renderDuas();
+            renderTodayDuas();
+        }
+    };
+
+    window.shareDua = function(id) {
+        let dua = loadedDuas.find(d => String(d.id) === String(id));
+        if (!dua) return;
+
+        let translation = (dua.translations && dua.translations[currentLanguage]) ? dua.translations[currentLanguage] : (dua.translations ? dua.translations['Urdu'] : '');
+        let shareText = `🤲 *${dua.title || 'Dua'}*\n\n${dua.arabic || ''}\n\n*Translation (${currentLanguage}):*\n${translation}\n\n📚 *Reference:* ${dua.reference || 'Masnoon Duas'}`;
+
+        if (navigator.share) {
+            navigator.share({ title: dua.title || 'Masnoon Dua', text: shareText }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(shareText).then(() => alert('Dua copied to clipboard!'));
+        }
+    };
+
+    // Profile Photo Upload
+    document.getElementById('imageUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('profileImage').src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Theme Color Select
+    document.getElementById('themeColorSelect').addEventListener('change', function(e) {
+        document.documentElement.style.setProperty('--primary-color', e.target.value);
+    });
+
+    // Status Save
+    window.saveStatus = function() {
+        const text = document.getElementById('statusInput').value.trim();
+        if (!text) return;
+
+        const expiryTimestamp = Date.now() + (24 * 60 * 60 * 1000);
+        const statusData = { text: text, expiry: expiryTimestamp };
+
+        localStorage.setItem('userStatusData', JSON.stringify(statusData));
+        document.getElementById('statusInput').value = '';
+        checkAndDisplayStatus();
+    };
+
+    function checkAndDisplayStatus() {
+        const statusDataRaw = localStorage.getItem('userStatusData');
+        const container = document.getElementById('statusDisplayContainer');
+        const textElem = document.getElementById('userStatusText');
+        const expiryElem = document.getElementById('statusExpiryTime');
+
+        if (!statusDataRaw) {
+            container.style.display = 'none';
+            return;
+        }
+
+        const statusData = JSON.parse(statusDataRaw);
+        if (Date.now() > statusData.expiry) {
+            localStorage.removeItem('userStatusData');
+            container.style.display = 'none';
+        } else {
+            container.style.display = 'block';
+            textElem.innerText = statusData.text;
+            const hoursLeft = Math.round((statusData.expiry - Date.now()) / (1000 * 60 * 60));
+            expiryElem.innerText = `Expires in approx ${hoursLeft} hour(s)`;
+        }
+    }
+
+    // Render Duas
+    window.renderDuas = function() {
+        const container = document.getElementById('duasContainer');
+        const searchInput = document.getElementById('searchInput');
+        const search = searchInput ? searchInput.value.toLowerCase() : '';
+        container.innerHTML = '';
+
+        let filtered = loadedDuas.filter(dua => {
+            let translation = (dua.translations && dua.translations[currentLanguage]) ? dua.translations[currentLanguage].toLowerCase() : '';
+            return (dua.title && dua.title.toLowerCase().includes(search)) || 
+                   (dua.arabic && dua.arabic.includes(search)) || 
+                   translation.includes(search);
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:20px; color:#777;">No Dua found.</p>';
+            return;
+        }
+
+        filtered.forEach(dua => {
+            let translation = (dua.translations && dua.translations[currentLanguage]) ? dua.translations[currentLanguage] : (dua.translations ? dua.translations['Urdu'] : '');
+            let isRtl = (currentLanguage === 'Urdu' || currentLanguage === 'Arabic') ? 'rtl' : '';
+
+            container.innerHTML += `
+                <div class="card">
+                    <h3>${dua.title || ''}</h3>
+                    <div class="arabic-text">${dua.arabic || ''}</div>
+                    <div class="translation-text ${isRtl}">${translation}</div>
+                    <div class="card-footer">
+                        <span>${dua.reference || ''}</span>
+                        <div class="card-actions">
+                            <button class="like-btn ${dua.isLiked ? 'liked' : ''}" onclick="toggleLike('${dua.id}')">
+                                ${dua.isLiked ? '❤️' : '🤍'} <span>${dua.likes || 0}</span>
+                            </button>
+                            <button class="share-btn" onclick="shareDua('${dua.id}')">
+                                🔗 Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    };
+
+    window.renderTodayDuas = function() {
+        const container = document.getElementById('todayDuasContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        let todayList = loadedDuas.filter(d => d.isToday);
+
+        if (todayList.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:20px; color:#777;">No Dua available for today.</p>';
+            return;
+        }
+
+        todayList.forEach(dua => {
+            let translation = (dua.translations && dua.translations[currentLanguage]) ? dua.translations[currentLanguage] : (dua.translations ? dua.translations['Urdu'] : '');
+            let isRtl = (currentLanguage === 'Urdu' || currentLanguage === 'Arabic') ? 'rtl' : '';
+
+            container.innerHTML += `
+                <div class="card">
+                    <h3>⭐ ${dua.title || ''}</h3>
+                    <div class="arabic-text">${dua.arabic || ''}</div>
+                    <div class="translation-text ${isRtl}">${translation}</div>
+                    <div class="card-footer">
+                        <span>${dua.reference || ''}</span>
+                        <div class="card-actions">
+                            <button class="like-btn ${dua.isLiked ? 'liked' : ''}" onclick="toggleLike('${dua.id}')">
+                                ${dua.isLiked ? '❤️' : '🤍'} <span>${dua.likes || 0}</span>
+                            </button>
+                            <button class="share-btn" onclick="shareDua('${dua.id}')">
+                                🔗 Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    };
+
+    // Event Listeners
+    document.getElementById('drawerToggleBtn').addEventListener('click', window.toggleDrawer);
+    document.getElementById('overlay').addEventListener('click', window.toggleDrawer);
+    document.getElementById('menuHome').addEventListener('click', () => window.switchTab('home'));
+    document.getElementById('menuToday').addEventListener('click', () => window.switchTab('today'));
+    document.getElementById('menuProfile').addEventListener('click', () => window.switchTab('profile'));
+    document.getElementById('navHome').addEventListener('click', () => window.switchTab('home'));
+    document.getElementById('navToday').addEventListener('click', () => window.switchTab('today'));
+    document.getElementById('navProfile').addEventListener('click', () => window.switchTab('profile'));
+    document.getElementById('searchInput').addEventListener('input', window.renderDuas);
+    document.getElementById('languageSelect').addEventListener('change', (e) => window.changeLanguage(e.target.value));
+    document.getElementById('saveStatusBtn').addEventListener('click', window.saveStatus);
+
+    checkAndDisplayStatus();
+</script>
+
+</body>
+</html>
